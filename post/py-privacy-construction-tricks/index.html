@@ -1,0 +1,245 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>如何在 python 中不允许用户直接构造对象 | 啊？</title>
+<link rel="shortcut icon" href="https://IorMemorE.github.io/favicon.ico?v=1690138503321">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://IorMemorE.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="如何在 python 中不允许用户直接构造对象 | 啊？ - Atom Feed" href="https://IorMemorE.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="如何在 python 中不允许用户直接构造对象
+今天先放在这，明天开始写
+一个奇怪的需求
+TODO
+一次失败的尝试
+TODO
+一瞬电光的灵感
+TODO
+一息暗淡的微光
+TODO
+一往无前的求索
+TODO
+一份尚可的答卷
+TODO
+简要代码示..." />
+    <meta name="keywords" content="Python,编程语言,奇技淫巧" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://IorMemorE.github.io">
+  <img class="avatar" src="https://IorMemorE.github.io/images/avatar.png?v=1690138503321" alt="">
+  </a>
+  <h1 class="site-title">
+    啊？
+  </h1>
+  <p class="site-description">
+    啊？
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://IorMemorE.github.io" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://IorMemorE.github.io/post/todo-list" class="menu">
+          未完之章
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              如何在 python 中不允许用户直接构造对象
+            </h2>
+            <div class="post-info">
+              <span>
+                2023-07-12
+              </span>
+              <span>
+                1 min read
+              </span>
+              
+                <a href="https://IorMemorE.github.io/tag/piyantonghong/" class="post-tag">
+                  # Python
+                </a>
+              
+                <a href="https://IorMemorE.github.io/tag/proglang/" class="post-tag">
+                  # 编程语言
+                </a>
+              
+                <a href="https://IorMemorE.github.io/tag/😍😍😍/" class="post-tag">
+                  # 奇技淫巧
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h1 id="如何在-python-中不允许用户直接构造对象">如何在 python 中不允许用户直接构造对象</h1>
+<p>今天先放在这，明天开始写</p>
+<h2 id="一个奇怪的需求">一个奇怪的需求</h2>
+<p>TODO</p>
+<h2 id="一次失败的尝试">一次失败的尝试</h2>
+<p>TODO</p>
+<h2 id="一瞬电光的灵感">一瞬电光的灵感</h2>
+<p>TODO</p>
+<h2 id="一息暗淡的微光">一息暗淡的微光</h2>
+<p>TODO</p>
+<h2 id="一往无前的求索">一往无前的求索</h2>
+<p>TODO</p>
+<h2 id="一份尚可的答卷">一份尚可的答卷</h2>
+<p>TODO</p>
+<p>简要代码示例：</p>
+<pre><code class="language-python"># privacy_construct_example.py
+class __Token: ...
+
+_token = __Token()
+class Example:
+    __token_t = type(_token)
+
+    def __init__(self,_direct_construction_is_not_allowed) -&gt; None:
+        &quot;&quot;&quot;
+        We provide some other class method to construct it.
+        Here are them:
+            create()
+        &quot;&quot;&quot;
+        if type(_direct_construction_is_not_allowed) != self.__token_t:
+            raise RuntimeError(&quot;Use .create method instead&quot;)
+
+    @classmethod
+    def create(cls):
+        return cls(cls.__token_t()) 
+    
+_token = None
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E5%A6%82%E4%BD%95%E5%9C%A8-python-%E4%B8%AD%E4%B8%8D%E5%85%81%E8%AE%B8%E7%94%A8%E6%88%B7%E7%9B%B4%E6%8E%A5%E6%9E%84%E9%80%A0%E5%AF%B9%E8%B1%A1">如何在 python 中不允许用户直接构造对象</a>
+<ul>
+<li><a href="#%E4%B8%80%E4%B8%AA%E5%A5%87%E6%80%AA%E7%9A%84%E9%9C%80%E6%B1%82">一个奇怪的需求</a></li>
+<li><a href="#%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%E7%9A%84%E5%B0%9D%E8%AF%95">一次失败的尝试</a></li>
+<li><a href="#%E4%B8%80%E7%9E%AC%E7%94%B5%E5%85%89%E7%9A%84%E7%81%B5%E6%84%9F">一瞬电光的灵感</a></li>
+<li><a href="#%E4%B8%80%E6%81%AF%E6%9A%97%E6%B7%A1%E7%9A%84%E5%BE%AE%E5%85%89">一息暗淡的微光</a></li>
+<li><a href="#%E4%B8%80%E5%BE%80%E6%97%A0%E5%89%8D%E7%9A%84%E6%B1%82%E7%B4%A2">一往无前的求索</a></li>
+<li><a href="#%E4%B8%80%E4%BB%BD%E5%B0%9A%E5%8F%AF%E7%9A%84%E7%AD%94%E5%8D%B7">一份尚可的答卷</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://IorMemorE.github.io/post/test/">
+              <h3 class="post-title">
+                Test
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  啊？
+  <a class="rss" href="https://IorMemorE.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

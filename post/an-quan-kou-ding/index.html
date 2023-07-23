@@ -1,0 +1,321 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>氨醛蔻啶 | 啊？</title>
+<link rel="shortcut icon" href="https://IorMemorE.github.io/favicon.ico?v=1690138503321">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://IorMemorE.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="氨醛蔻啶 | 啊？ - Atom Feed" href="https://IorMemorE.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="氨醛蔻啶·一
+这个系列的文章是关于安全的，作为第一篇文章，我们从一个简单的角度切入。
+安全风险
+在编程中，我们的代码可能会遇到很多问题，这些问题会使得我们得不到预期的结果，一般，我们称之为bug。
+bug有千万种，就挑其中一类会造成很严重后..." />
+    <meta name="keywords" content="Rust,安全,编程语言,奇技淫巧" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://IorMemorE.github.io">
+  <img class="avatar" src="https://IorMemorE.github.io/images/avatar.png?v=1690138503321" alt="">
+  </a>
+  <h1 class="site-title">
+    啊？
+  </h1>
+  <p class="site-description">
+    啊？
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="https://IorMemorE.github.io" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+      
+        <a href="https://IorMemorE.github.io/post/todo-list" class="menu">
+          未完之章
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              氨醛蔻啶
+            </h2>
+            <div class="post-info">
+              <span>
+                2023-07-23
+              </span>
+              <span>
+                12 min read
+              </span>
+              
+                <a href="https://IorMemorE.github.io/tag/ferris!/" class="post-tag">
+                  # Rust
+                </a>
+              
+                <a href="https://IorMemorE.github.io/tag/safety/" class="post-tag">
+                  # 安全
+                </a>
+              
+                <a href="https://IorMemorE.github.io/tag/proglang/" class="post-tag">
+                  # 编程语言
+                </a>
+              
+                <a href="https://IorMemorE.github.io/tag/😍😍😍/" class="post-tag">
+                  # 奇技淫巧
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content" v-pre>
+                <h1 id="氨醛蔻啶一">氨醛蔻啶·一</h1>
+<p>这个系列的文章是关于安全的，作为第一篇文章，我们从一个简单的角度切入。</p>
+<h2 id="安全风险">安全风险</h2>
+<p>在编程中，我们的代码可能会遇到很多问题，这些问题会使得我们得不到预期的结果，一般，我们称之为bug。<br>
+bug有千万种，就挑其中一类会造成很严重后果的bug，尤其是那些直接和内存打交道而产生的，我们称之为“内存不安全”。</p>
+<p>我们将内存安全定义为：对内存的操作与预期一致且有效。自然，一些诸如解引用空指针、野指针、多重释放等操作，自然就是内存不安全的。</p>
+<p>内存安全是一个很重要的议题。微软的安全工程师曾在2019年提出，安全漏洞中有70%是因为内存安全的问题所造成。2020年时，有一个Google的团队也提出Google Chromium的“严重安全问题”中，有70%是因为内存安全问题造成。许多备受关注的漏洞以及关键软件的漏洞利用也是因为缺乏内存安全，这些漏洞包括心脏出血漏洞，以及为时已久，在Sudo中权限提升的错误。<br>
+内存安全问题带来的漏洞及漏洞利用如此普遍，而且相当严重，许多软件安全研究者认为在程序中发现内存安全问题，是像“瓮中捉鳖”一样简单的事。</p>
+<p>但是，与其说是“发现”这些问题，倒不如一开始就将问题扼杀在摇篮里，来，接下来我们开动一下脑筋，思考如何“不产生”安全问题。</p>
+<h2 id="前置知识">前置知识</h2>
+<h3 id="1-rust的借用安全保障">1 - Rust的借用安全保障</h3>
+<p>在正式进入内容前，我们做一个小游戏，这里有一段C++代码</p>
+<pre><code class="language-c++">#include&lt;vector&gt;
+#include&lt;iostream&gt;
+int main() {
+    std::vector&lt;int&gt; v {1,2,3,4};
+    int const &amp; e = v[2];
+    for(int i = 0;i &lt; 12345;++i) {
+        v.push_back(i);
+    }
+    std::cout &lt;&lt; e &lt;&lt; std::endl;
+}
+</code></pre>
+<p>大家猜一猜这段代码输出的是啥。</p>
+<p>我猜你会说输出“3”，但是，如果你执行这一段代码会发现，每次的输出都不一样。欸，怎么回事呢？</p>
+<p>原来啊，<code>v</code>满装了后又往里面装元素，这时候发生了扩容，申请了一片新的内存区域，把当前数据移动过去，然后，释放掉原来的内存。这时候，<code>e</code>俨然成为了一个无效引用，指向了茫茫内存空间中的一处苍凉荒野。</p>
+<p>吸取了这样的教训，Rust提出了一个激进的借用原则：要么存在任意个共享引用，要么存在一个可变引用。<br>
+如果将上述的代码翻译为Rust，那么长这样：</p>
+<pre><code class="language-rust">fn main() {
+    let mut v = vec![1,2,3,4];
+    let ref e = v[3];
+    for i in 0..12345 {
+        v.push(i);
+    }
+    println!(&quot;{e}&quot;)
+}
+</code></pre>
+<p>很显然，Rust是不给你通过编译的，这就助力保障了Safe Rust里不会产生无效的引用。</p>
+<p>但是，这是有缺点的，如果一个图灵完备的编程语言是内存安全的，那么它是不完全的。举个例子，即存在违背借用规则但是仍然内存安全的程序。所以Rust提出了<code>Rc</code>/<code>RefCell</code>之类用于绕过编译限制，将保证交到运行时的产物。</p>
+<h3 id="2-不安全是指什么">2 - 不安全是指什么</h3>
+<p>我们把<strong>可能</strong>造成内存错误的操作称为不安全操作，言外之意，进行不安全操作<strong>不一定</strong>导致内存问题，而是需要你提供额外的安全保证。</p>
+<h2 id="供给侧我的地盘我做主">供给侧——我的地盘我做主</h2>
+<p>“供给侧”这个词比较抽象，这里是指库作者、编译器、解释器等提供用户使用内容的一侧，因为是为用户“提供”一些东西，所以有着能够决定用户能否使用、如何使用的权限的，作为一方霸主，用户想要撒野，得看看你的面子。</p>
+<p>那么，作为供给侧，如何使得用户的操作都是安全的呢？很简单，只要让用户“不”进行不安全的操作就行了。</p>
+<p>所以？只要在文档里说一句：“该API不安全，不要使用”，用户就不用了吗？怎么可能，不看文档，一通乱梭哈的人不在少数，看了建议，但是咚咚撞大墙的人也从不嫌多。想要达成目的，我们就要主观上在编写过程中加以限制，使得用户不去使用这些不安全的东西。</p>
+<p>习近平总书记指出，一体推进不敢腐、不能腐、不想腐，不仅是反腐败斗争的基本方针，也是新时代全面从严治党的重要方略。中共十九届四中全会《决定》将构建一体推进不敢腐、不能腐、不想腐体制机制，作为坚持和完善党和国家监督体系重要内容，单列一条作出部署。这是坚持和完善中国特色社会主义制度、推进国家治理体系和治理能力现代化的重大举措。</p>
+<p>总书记是对的，使得用户不能、不敢、不想进行不安全的操作的“三不”方针也是我们保障用户侧安全的基本方针，下面我们一一来看。</p>
+<h3 id="不能做不到怎么想想都做不到吧">不能——做不到，怎么想想都做不到吧</h3>
+<p>首先，最直截了当的做法就是禁止使用。只要你没法用，就算我写的API是一调用就触发内存问题，那也统统不会造成影响。</p>
+<p>一个典型的例子就是rust的XOR借用原则，违背这个原则就不给你编译，即使你的代码有内存安全的问题，但是它不能编译，这个内存问题就不会产生，自然保障了安全。</p>
+<p>但是，我们作为库作者，没法像编译器那样引入机制杜绝此类问题，怎么办呢？很简单，不对外公开该不安全的API即可。这个做法和Monad的思路是一样的，包在里面，你看不见，不知道，摸不着，那就是没有问题。<br>
+比如说参考以下代码：</p>
+<pre><code class="language-rust">mod my_mod {
+    unsafe fn __deref_nullptr() {
+        std::ptr::null_mut::&lt;bool&gt;().write_volatile(false);
+    }
+}
+</code></pre>
+<p>一旦该函数被调用，那么就会发生解引用空指针的内存问题，这是我们不愿意见到的。但是，只要不<code>pub</code>出去，用户调用不了这个函数，那么自然，也不会因为该函数而造成内存问题。</p>
+<p>由于这种限制级安全会使得其不完全，所以会导致一些违背限制但是不会有安全问题的程序没办法通过，好家伙，宁可错杀一千也不放过一个是吧。</p>
+<h3 id="不敢风险太大人家怕怕">不敢——风险太大，人家怕怕</h3>
+<p>退而求其次，如果我们确实没办法让用户不能使用，那么，我们可以诉诸使用的后果，说明如果不满足限定条件，那么就会发什么什么。<br>
+举一个现实一点的例子，看图：<br>
+<img src="https://IorMemorE.github.io/post-images/1690138234623.png" alt="禁止攀爬，后果自负" loading="lazy"><br>
+图上有个很醒目的红色标语：“禁止攀爬，后果自负”。我们可以抽象出安全问题（后果）：掉下去摔成一坨，不安全行为：攀爬这个拱形建筑物。那么我们硬是要爬这个坡可不可以，可以，但是不安全，为什么不安全，因为可能会摔下来，轻则磕破皮肤，重则粉碎骨折，代价很大，后果很严重，所以，一般人看到了之后通常不敢攀爬，也就不进行该不安全的操作了。</p>
+<p>现在法律的约束差不多也是这样，声明做了某些事情的后果，从而使得人不敢去做。</p>
+<p>这是一个在编程中经常会使用的策略，看起来并没有上面一种方案那么蛮横霸道或者说阴毒猥琐，反而很正人君子一，利弊全都给你摆在面前，怎么权衡那就看你自己了。比如说，Rust里标记为unsafe的项目。unsafe不一定真的导致不安全，而是需要你做出安全保障，声明自己已经满足了某些条件，进行该不安全行为不会造成内存问题，比方说：</p>
+<pre><code class="language-rust">// 举例子罢了，实际哪有人会这样写？
+unsafe fn example_fn(arg:bool) -&gt; bool {
+    if arg {
+        std::ptr::null_mut::&lt;bool&gt;().write_volatile(false);
+    } 
+    return !arg;
+}
+</code></pre>
+<p>函数需要调用者确保传入的参数不为true，否则会造成无效访问。也就是说，该函数当且仅当在参数不为true的情况下，不会造成安全问题，而不是一定不会产生安全问题，需要用户做出保证，风险将由用户自己承担，基于保守的假设，多数用户就不敢使用该不安全的API，转而寻找安全的替代品。</p>
+<p>回到那个带有警告的小坡，如果说我有金刚不坏铁布衫，掉下去啥事没有，那么我攀爬有事吗？当然没事，风险交给攀爬者，需要攀爬者自己辨别是否要攀爬，如果觉得会受伤自然就不敢爬了。</p>
+<h3 id="不想我摆了你们随意">不想——我摆了，你们随意</h3>
+<p>再退一步，要是我们的API真的都是很安全很安全的呢，但是由于某些原因，用户可以绕过我们设置的屏障而使得我们的安全保障失效，那么怎么办呢？<br>
+举个简单的例子：</p>
+<pre><code class="language-rust">use ghost_cell::{GhostCell,GhostToken};
+
+fn main() {
+    let v = GhostToken::new(|_| {
+        let gcv: Vec&lt;GhostCell&lt;i32&gt;&gt; = vec![1.into(),2.into(),3.into()];
+        gcv
+    });
+    *v[0].borrow_mut(???) += 1;
+}
+</code></pre>
+<p>正常情况下，我们是修改不了<code>v[0]</code>里对应的值的，但是，我们又需要修改，那么怎么办呢？如果库作者不小心，放出来一个方法：</p>
+<pre><code class="language-rust">fn make_ghost_token&lt;'a&gt;() -&gt; GhostToken&lt;'a&gt;;
+</code></pre>
+<p>这个方法是安全的，实现也不需要任何不安全的代码块，但是，就是这样一个方法，就能打破整个GhostCell库的分离数据和数据权限的安全保障（具体怎么打破的，可以回顾之前的文章）。这下安全地让库变得不安全了，怎么办呢？</p>
+<p>那就万般阻拦，使得绕过安全屏障变得困难，这样就能使得一大批人放弃绕过的想法，从而乖乖接受我们的安全要求。</p>
+<p>举个比较现实的例子吧，就像你去某机构办事，先让你转这个部门，再让你到那个部门，欸，又把皮球踢给另一个部门，兜兜转转又回到最初的起点，问题还是那个问题，但是事情是丝毫没有办半点。</p>
+<p>要想写个程序来说明还真的一时半会想不到，等想到了再说吧。<br>
+总之，而这种限制最弱，只要愿意，就能写出不安全的程序，但是往往触发的频度没有上一种高（毕竟一个unsafe的事情，而这一种方式需要山路十八弯）。</p>
+<h2 id="结语">结语</h2>
+<p>总的来说，供给侧具有主导权，可以使用一些比较凌驾的手段保证安全，但是使用侧则更加灵活，突破安全屏障的手段也不少，但是，谁会闲得无聊让自己的程序漏洞百出？<br>
+不能，具有最强的保障，用户绝对不会写出不安全的程序。<br>
+不敢，让用户在进行不安全的操作时深思熟虑，进一步提高了程序的安全性。<br>
+不想，一定程度上阻止了用户随意写出不安全程序的可能性，但是只要愿意，总有写出不安全程序的可能。<br>
+所以，安全之路，任重而道远啊。</p>
+<h2 id="后记">后记</h2>
+<p>本来文中的“三不”是来自《强奸罪的司法实践》的，但是后来找到了更加恰当的（就是现在文章里的版本）。你看，我们把不安全的操作如果想得很阴暗，那么就和腐败也差不多，如果你不安全的操作进行了，但是没有造成严重后果，几乎是没人去追究的，但是要是一旦，那么，一破，卧龙出山。再说了，那样不就是意味着：本文在教你如何进行对用户的强奸？很显然，互联网不是法外之地，impart不能乱开。</p>
+<h2 id="参考">参考</h2>
+<p><a href="https://zh.wikipedia.org/wiki/%E8%A8%98%E6%86%B6%E9%AB%94%E5%AE%89%E5%85%A8">维基百科：内存安全</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#%E6%B0%A8%E9%86%9B%E8%94%BB%E5%95%B6%E4%B8%80">氨醛蔻啶·一</a>
+<ul>
+<li><a href="#%E5%AE%89%E5%85%A8%E9%A3%8E%E9%99%A9">安全风险</a></li>
+<li><a href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86">前置知识</a>
+<ul>
+<li><a href="#1-rust%E7%9A%84%E5%80%9F%E7%94%A8%E5%AE%89%E5%85%A8%E4%BF%9D%E9%9A%9C">1 - Rust的借用安全保障</a></li>
+<li><a href="#2-%E4%B8%8D%E5%AE%89%E5%85%A8%E6%98%AF%E6%8C%87%E4%BB%80%E4%B9%88">2 - 不安全是指什么</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BE%9B%E7%BB%99%E4%BE%A7%E6%88%91%E7%9A%84%E5%9C%B0%E7%9B%98%E6%88%91%E5%81%9A%E4%B8%BB">供给侧——我的地盘我做主</a>
+<ul>
+<li><a href="#%E4%B8%8D%E8%83%BD%E5%81%9A%E4%B8%8D%E5%88%B0%E6%80%8E%E4%B9%88%E6%83%B3%E6%83%B3%E9%83%BD%E5%81%9A%E4%B8%8D%E5%88%B0%E5%90%A7">不能——做不到，怎么想想都做不到吧</a></li>
+<li><a href="#%E4%B8%8D%E6%95%A2%E9%A3%8E%E9%99%A9%E5%A4%AA%E5%A4%A7%E4%BA%BA%E5%AE%B6%E6%80%95%E6%80%95">不敢——风险太大，人家怕怕</a></li>
+<li><a href="#%E4%B8%8D%E6%83%B3%E6%88%91%E6%91%86%E4%BA%86%E4%BD%A0%E4%BB%AC%E9%9A%8F%E6%84%8F">不想——我摆了，你们随意</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BB%93%E8%AF%AD">结语</a></li>
+<li><a href="#%E5%90%8E%E8%AE%B0">后记</a></li>
+<li><a href="#%E5%8F%82%E8%80%83">参考</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://IorMemorE.github.io/post/crabstracty/">
+              <h3 class="post-title">
+                抽象启示录
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  啊？
+  <a class="rss" href="https://IorMemorE.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
